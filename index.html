@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Celtics Lucky Lineup</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{--g1:#0b3d2e;--g2:#007a33;--gold:#f5c542;--cream:#fff8e1}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:"Segoe UI",system-ui,sans-serif;color:var(--cream);overflow:hidden;
+    background:radial-gradient(ellipse at 50% 0%,#0f6b43 0%,var(--g1) 55%,#04180f 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:0 16px 14px;
+  }
+  h1{margin:0;font-size:clamp(20px,3.2vw,34px);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-shadow:0 0 18px rgba(245,197,66,.55)}
+  .sub{opacity:.7;font-size:13px;margin-top:2px;text-align:center;letter-spacing:.08em}
+
+  .top{align-self:stretch;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;
+       margin:0 -16px;padding:12px 16px;background:#fff;border-bottom:4px solid var(--gold);box-shadow:0 4px 18px rgba(0,0,0,.35)}
+  .top .ttl{text-align:center;min-width:0}
+  .top h1{color:var(--g1);text-shadow:none;font-size:clamp(16px,3vw,30px)}
+  .top .sub{color:var(--g1);opacity:.7}
+  .top .vm{height:clamp(44px,8vw,68px);width:auto;justify-self:start}
+  .top .wl{height:clamp(26px,4.4vw,40px);width:auto;justify-self:end}
+  @media (max-width:520px){.top .sub{display:none}}
+  .lineup{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.6vw,20px);width:min(1100px,100%);margin:10px 0}
+  .slot{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .pos{font-weight:800;letter-spacing:.2em;color:var(--gold);font-size:clamp(14px,1.8vw,20px)}
+  .reel{
+    position:relative;width:100%;height:clamp(150px,27vh,190px);overflow:hidden;border-radius:16px;
+    background:linear-gradient(#fff 0,#f3f0e2 100%);border:3px solid var(--gold);
+    box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 0 22px rgba(0,0,0,.25);
+  }
+  .reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:26%;z-index:2;pointer-events:none}
+  .reel::before{top:0;background:linear-gradient(rgba(0,0,0,.35),transparent)}
+  .reel::after{bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.35))}
+  .strip{will-change:transform}
+  .item{height:var(--h);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#0b3d2e;text-align:center;padding:0 6px;line-height:1.05}
+  .item img{width:58px;height:58px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#d7efe0;border:2px solid var(--g2);margin-bottom:4px;flex:none}
+  .item .first{font-size:clamp(11px,1.3vw,14px);font-weight:600;opacity:.75}
+  .item .last{font-size:clamp(15px,2vw,22px);font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+  .item .num{font-size:11px;font-weight:800;color:var(--g2);margin-top:1px}
+  .slot.locked .reel{box-shadow:0 0 0 2px #fff,0 0 28px 6px rgba(245,197,66,.8)}
+  .slot.tatum .reel{background:linear-gradient(#fff6c8,#f5c542);border-color:#fff;animation:glow 2.2s ease-in-out infinite}
+  .slot.tatum .pos::after{content:" ★";}
+  @keyframes glow{50%{box-shadow:0 0 36px 10px rgba(245,197,66,.8),0 8px 24px rgba(0,0,0,.5)}}
+  .slot.pop .reel{animation:pop .5s ease-out}
+  @keyframes pop{40%{transform:scale(1.08)}}
+
+  .msg{max-width:900px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;font-size:clamp(18px,2.8vw,30px);font-weight:800;text-align:center;color:var(--gold);
+       opacity:0;transform:translateY(10px) scale(.96);transition:.5s;text-shadow:0 0 16px rgba(245,197,66,.6)}
+  .msg.hd{min-height:42px;margin-top:6px}
+  .msg.cap-card{min-height:76px;padding:12px 22px;border-radius:14px;background:#fff8e1;color:#0b3d2e;border:2px solid var(--gold);
+       text-shadow:none;font-size:clamp(15px,2.1vw,21px);font-weight:700;line-height:1.3;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .msg.show{opacity:1;transform:none}
+
+  .btnwrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+  #go{
+    position:relative;width:150px;height:150px;border-radius:50%;border:5px solid var(--gold);cursor:pointer;padding:0;
+    background:radial-gradient(circle at 35% 30%,#2fbf6a,#007a33 60%,#04502a);
+    box-shadow:0 0 0 0 rgba(245,197,66,.7),0 10px 30px rgba(0,0,0,.6);
+    animation:pulse 2s infinite;transition:transform .15s;
+  }
+  #go:hover{transform:scale(1.07) rotate(-3deg)}
+  #go:active{transform:scale(.95)}
+  #go:disabled{cursor:progress;animation:none;filter:saturate(1.3)}
+  #go svg{width:128px;height:128px;margin:-2px 0 0 -2px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+  #go.spinning svg{animation:wiggle .25s infinite alternate}
+  @keyframes pulse{70%{box-shadow:0 0 0 22px rgba(245,197,66,0),0 10px 30px rgba(0,0,0,.6)}100%{box-shadow:0 0 0 0 rgba(245,197,66,0),0 10px 30px rgba(0,0,0,.6)}}
+  @keyframes wiggle{from{transform:rotate(-7deg) scale(1.03)}to{transform:rotate(7deg) scale(.98)}}
+  .btnlabel{font-weight:800;letter-spacing:.2em;font-size:13px;color:var(--gold)}
+  canvas{position:fixed;inset:0;pointer-events:none;z-index:10}
+</style>
+</head>
+<body>
+  <header class="top">
+    <img class="vm" src="logos/vzyal-myach.png" alt="Взял Мяч" draggable="false">
+    <div class="ttl">
+      <h1>☘ Boston Celtics ☘</h1>
+      <div class="sub">Стартовая пятёрка на удачу</div>
+    </div>
+    <img class="wl" src="logos/winline.png" alt="Winline" draggable="false">
+  </header>
+
+  <div class="msg hd" id="hd">🍀 Поздравляю! Сегодня вы играете этим составом! 🍀</div>
+  <div class="lineup" id="lineup"></div>
+  <div class="msg cap-card" id="msg"><div id="cap"></div></div>
+
+  <div class="btnwrap">
+    <button id="go" title="Крутить!" aria-label="Крутить">
+      <!-- Лепрекон -->
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 52 Q18 88 50 94 Q82 88 78 52 Q50 70 22 52Z" fill="#e8741c"/>
+        <path d="M30 70 Q40 84 50 80 Q60 84 70 70 Q50 78 30 70Z" fill="#c95a0b"/>
+        <ellipse cx="50" cy="52" rx="24" ry="22" fill="#ffd9b3"/>
+        <circle cx="36" cy="58" r="5" fill="#ff9d8a" opacity=".6"/><circle cx="64" cy="58" r="5" fill="#ff9d8a" opacity=".6"/>
+        <path d="M33 43 Q39 39 45 43" stroke="#c95a0b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M55 43 Q61 39 67 43" stroke="#c95a0b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <circle cx="39" cy="49" r="3.2" fill="#123"/><circle cx="61" cy="49" r="3.2" fill="#123"/>
+        <circle cx="40" cy="48" r="1" fill="#fff"/><circle cx="62" cy="48" r="1" fill="#fff"/>
+        <ellipse cx="50" cy="56" rx="4.5" ry="3.6" fill="#ffb98a"/>
+        <path d="M38 62 Q50 74 62 62 Q50 66 38 62Z" fill="#fff" stroke="#8a3d08" stroke-width="1.5"/>
+        <ellipse cx="50" cy="32" rx="34" ry="8" fill="#0a5a2b"/>
+        <path d="M30 32 L33 8 Q50 0 67 8 L70 32Z" fill="#0f8a40"/>
+        <rect x="31" y="22" width="38" height="8" fill="#111"/>
+        <rect x="43" y="20.5" width="14" height="11" rx="1.5" fill="none" stroke="#f5c542" stroke-width="2.6"/>
+        <g transform="translate(78 80)" fill="#2fd16c" stroke="#064d22" stroke-width="1">
+          <circle cx="-4" cy="-4" r="4.5"/><circle cx="4" cy="-4" r="4.5"/><circle cx="-4" cy="4" r="4.5"/><circle cx="4" cy="4" r="4.5"/>
+        </g>
+      </svg>
+    </button>
+    <div class="btnlabel">КРУТИТЬ</div>
+  </div>
+
+  <canvas id="fx"></canvas>
+
+<script>
+/* ===== Ростер: правь имена как нужно. Один игрок может стоять в нескольких позициях. ===== */
+/* Состав сезона 2026-27 по данным ESPN (на 30.10.2026). Фото лежат в папке photos/<id>.png.
+   Девин Картер сейчас травмирован (Out), поэтому в пулы не включён. */
+const PLAYERS = {
+  "Jayson Tatum":     {id:4065648, num:0},
+  "Derrick White":    {id:3078576, num:9},
+  "Payton Pritchard": {id:4066354, num:11},
+  "Mike Conley":      {id:3195,    num:45},
+  "Ron Harper Jr.":   {id:4397251, num:8},
+  "Baylor Scheierman":{id:4593841, num:55},
+  "Hugo Gonzalez":    {id:5175647, num:28},
+  "Jordan Walsh":     {id:4683689, num:27},
+  "Paul George":      {id:4251,    num:13},
+  "Sam Hauser":       {id:4065804, num:30},
+  "Chris Cenac Jr.":  {id:5142621, num:12},
+  "Dillon Mitchell":  {id:5106283, num:20},
+  "Neemias Queta":    {id:4397424, num:88},
+  "Mitchell Robinson":{id:4351852, num:4},
+  "Luka Garza":       {id:4277951, num:52},
+  "Amari Williams":   {id:4702745, num:77}
+};
+const ROSTER = {
+  PG: ["Payton Pritchard","Derrick White","Mike Conley"],
+  SG: ["Derrick White","Payton Pritchard","Baylor Scheierman","Ron Harper Jr.","Hugo Gonzalez","Jordan Walsh"],
+  SF: ["Jayson Tatum"],
+  PF: ["Paul George","Sam Hauser","Chris Cenac Jr.","Dillon Mitchell","Jordan Walsh"],
+  C:  ["Neemias Queta","Mitchell Robinson","Luka Garza","Amari Williams"]
+};
+const POS = ["PG","SG","SF","PF","C"];
+
+/* ===== Подписи после каждого прокрута: только реальные цитаты ведущих. Формат: q("цитата","Имя Фамилия"). ===== */
+/* Реальные фразы ведущих из эфиров «Взял мяч» (по расшифровкам). Формат: «цитата» (с) Имя. */
+const q = (t,a)=>`«${t}» (с) ${a}`;
+const HOST_CAPTIONS = [
+  q("Мы можем быть уверены, что Джейсон Тейтум получает Miracle Care не хуже, чем космонавты НАСА.","Дмитрий Матеранский"),
+  q("Вайб в команде потрясающий.","Игорь Знаменский"),
+  q("Бостон лучший из них, чемпионский опыт, вернётся Тейтум.","Игорь Знаменский"),
+  q("Ты смотришь, думаешь: блин, видно, это дальше работать не будет.","Андрей Панкрашев"),
+  // +найденные цитаты
+  q("Это не потому, что он гений, а потому, что остальные настолько хуже.","Игорь Знаменский"),
+  q("Это Алекс Карузо и его волшебная кроссовка.","Игорь Знаменский"),
+  q("Потом увольняем ген-менеджера, который этот состав собирал.","Игорь Знаменский"),
+  q("Мы такие, господи, такого не было никогда.","Игорь Знаменский"),
+  q("Миннесоте супер повезло, что она в этом положении оказалась.","Игорь Знаменский"),
+  q("Это не семь лет строгого режима, это семь баллов дизреспекта.","Андрей Панкрашев"),
+  q("То есть у них три победы за 20 игр, кошмар просто полный.","Андрей Панкрашев"),
+  q("Надеемся, что вы так же кайфуете от баскетбола в финале НБА, как и мы.","Андрей Панкрашев"),
+  q("Принести титул в Никс — отдельная драма.","Андрей Панкрашев"),
+  q("Что ж, время показать, насколько они были неправы.","Андрей Панкрашев"),
+  q("Мы будем рады, если мы с точки зрения нашего скептицизма ошибемся.","Андрей Панкрашев"),
+  q("Я жду запроса звезды на обмен, я жду скандал.","Андрей Панкрашев"),
+  q("Я не знаю, не, они подерутся в раздевалке, я не знаю.","Андрей Панкрашев"),
+  q("Так, да-да-да-да, магия телевидения пошла.","Андрей Панкрашев"),
+  q("Но я верю в магию Спаэльстера, верю в магию того, что может что-то придумать.","Сергей Абаев"),
+  q("Я не понимаю, какая идеальная пятёрка у Детройта.","Сергей Абаев"),
+  q("Нет, то есть реально, я к тому, что пускай Вембе бросает дичь.","Сергей Абаев"),
+  q("Я просто не понимаю, почему мы так переоценивали, на самом деле.","Сергей Абаев"),
+  q("Егорыч, ну, во-первых… Не каждый прогноз должен сбываться.","Сергей Абаев"),
+  q("Это не объяснить, но у него эта магия есть.","Егор Родионов"),
+  q("Я готов купить джерси Каруза, но не знаю, в какой команде.","Егор Родионов"),
+  q("Ребят, дайте кредит Вембе, это его первый сезон и сразу финал.","Егор Родионов"),
+  q("И только чудо реально может это исправить.","Егор Родионов"),
+  q("Ты работай, мы пока ищем тренера за миллион долларов тебе.","Дмитрий Матеранский"),
+  q("Я не знаю, откуда там у меня ещё 100 миллионов долларов.","Дмитрий Матеранский"),
+  q("Я тебе больше скажу, у меня из Бостона вообще никого в топ-10.","Стас Крайнов"),
+  q("Я не знаю, Стеф вот здесь просто влюбляет меня.","Стас Крайнов"),
+  q("Они сажают дедушку вот с этой дуделкой вместо сирены.","Стас Крайнов"),
+  q("Ребята вышли как будто просто побегать на тренировку.","Стас Крайнов"),
+  q("Мы знаем о скрытом плане Голден Стэйт, построить мега-команду от дедов.","Дима Сидоренко"),
+  q("Но я почему-то вдруг опять верю в Индиану.","Дима Сидоренко"),
+  q("Мы готовы, чтобы ты остался, но на наших условиях.","Дима Сидоренко"),
+  q("Да он стэпбэками этих зомби просто завалит.","Митя Хамидулин"),
+  q("Я бы даже, честно говоря, полетел бы на чемпионский парад Никс.","Митя Хамидулин"),
+  q("Я после первого матча плевался в обе стороны, между прочим.","Митя Хамидулин"),
+  q("А я не буду сейчас притворяться, что я говорил, да Бостон вылетит, конечно.","Митя Хамидулин"),
+  q("Ну, минус 30 — это позорище, на самом деле, абсолютно для Детройта.","Митя Хамидулин")
+];
+const GENERAL = HOST_CAPTIONS;
+// Подписи под конкретных игроков: [условие по составу, [фразы]]
+const CONTEXT = [
+  [r=>true, [
+    q("Мне интересно, что будет, если Тейтум вернётся сейчас.","Игорь Знаменский"),
+    q("Кто верит, что Тейтум в этом году вернётся?","Андрей Панкрашев"),
+    q("Для меня это была такая красивая сказка.","Егор Родионов")
+  ]]
+];
+let lastCaption = "";
+function pickCaption(res){
+  const ctx = CONTEXT.filter(([ok])=>ok(res)).flatMap(([,l])=>l);
+  let c;
+  for(let i=0;i<10;i++){
+    c = (Math.random()<.4 && ctx.length) ? rand(ctx) : rand(GENERAL);
+    if(c!==lastCaption) break;
+  }
+  return (lastCaption = c);
+}
+/* ========================================================================================= */
+
+const $ = s => document.querySelector(s);
+const lineup = $("#lineup"), msg = $("#msg"), hd = $("#hd"), btn = $("#go");
+let H = 0;
+
+const rand = a => a[Math.floor(Math.random()*a.length)];
+function itemHTML(full){
+  const p = full.split(" "); const last = p.pop();
+  const pl = PLAYERS[full];
+  const img = pl ? `<img src="photos/${pl.id}.png" alt="" draggable="false" onerror="this.style.visibility='hidden'">` : "";
+  const num = pl ? `<span class="num">#${pl.num}</span>` : "";
+  return `<div class="item">${img}<span class="first">${p.join(" ")}</span><span class="last">${last}</span>${num}</div>`;
+}
+
+const slots = POS.map(pos=>{
+  const el = document.createElement("div");
+  el.className = "slot" + (pos==="SF" ? " tatum":"");
+  el.innerHTML = `<div class="pos">${pos}</div><div class="reel"><div class="strip"></div></div>`;
+  lineup.appendChild(el);
+  return {pos, el, reel: el.querySelector(".reel"), strip: el.querySelector(".strip")};
+});
+function measure(){
+  H = slots[0].reel.clientHeight;
+  slots.forEach(s=>s.el.style.setProperty("--h", H+"px"));
+}
+function showName(s, name){
+  s.strip.style.transition="none";
+  s.strip.style.transform="translateY(0)";
+  s.strip.innerHTML = itemHTML(name);
+}
+function init(){
+  measure();
+  slots.forEach(s=>{
+    if(s.pos==="SF") showName(s, ROSTER.SF[0]);
+    else s.strip.innerHTML = `<div class="item"><span class="last">?</span></div>`;
+  });
+}
+addEventListener("resize", measure);
+
+function pickLineup(){
+  const used = new Set(), res = {};
+  const order = POS.filter(p=>p!=="SF").sort(()=>Math.random()-.5);
+  for(const pos of order){
+    const opts = ROSTER[pos].filter(n=>!used.has(n));
+    const n = rand(opts.length?opts:ROSTER[pos]);
+    used.add(n); res[pos]=n;
+  }
+  res.SF = ROSTER.SF[0];
+  return res;
+}
+
+let ac;
+function beep(f,d=.08,v=.05,type="triangle"){
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type=type; o.frequency.value=f; g.gain.value=v;
+    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime+d);
+    o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime+d);
+  }catch(e){}
+}
+const chime = ()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.25,.07,"sine"),i*110));
+
+const cv = $("#fx"), cx = cv.getContext("2d");
+let parts = [];
+function fit(){ cv.width=innerWidth; cv.height=innerHeight; }
+addEventListener("resize",fit); fit();
+const COLORS = ["#f5c542","#fff3a8","#2fd16c","#7dffb0","#ffffff"];
+function burst(x,y,n=40,power=6,shamrock=false){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, s=Math.random()*power+1;
+    parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:1,decay:.008+Math.random()*.015,
+      size:2+Math.random()*4,c:rand(COLORS),sh:shamrock&&Math.random()<.35,rot:Math.random()*6});
+  }
+}
+function sparkleAround(el){
+  const r=el.getBoundingClientRect();
+  const a=Math.random()*Math.PI*2, d=r.width/2+Math.random()*20;
+  parts.push({x:r.left+r.width/2+Math.cos(a)*d,y:r.top+r.height/2+Math.sin(a)*d,
+    vx:Math.cos(a)*.8,vy:Math.sin(a)*.8-1,life:1,decay:.02,size:2+Math.random()*3,c:rand(COLORS),sh:false,rot:0});
+}
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts = parts.filter(p=>p.life>0);
+  for(const p of parts){
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.12; p.vx*=.99; p.life-=p.decay; p.rot+=.1;
+    cx.globalAlpha=Math.max(p.life,0); cx.fillStyle=p.c; cx.shadowColor=p.c; cx.shadowBlur=10;
+    if(p.sh){ cx.font=(p.size*4)+"px serif"; cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot); cx.fillText("☘",-p.size*2,p.size*2); cx.restore(); }
+    else{
+      const s=p.size; cx.beginPath();
+      cx.moveTo(p.x,p.y-s*1.8); cx.lineTo(p.x+s*.4,p.y-s*.4); cx.lineTo(p.x+s*1.8,p.y); cx.lineTo(p.x+s*.4,p.y+s*.4);
+      cx.lineTo(p.x,p.y+s*1.8); cx.lineTo(p.x-s*.4,p.y+s*.4); cx.lineTo(p.x-s*1.8,p.y); cx.lineTo(p.x-s*.4,p.y-s*.4); cx.fill();
+    }
+  }
+  cx.globalAlpha=1; requestAnimationFrame(loop);
+}
+loop();
+const center = el=>{const r=el.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2];};
+
+function lock(s){
+  s.el.classList.add("locked","pop");
+  const [x,y]=center(s.reel); burst(x,y,45,6,true); beep(880,.12,.07,"sine");
+}
+
+let busy=false;
+btn.addEventListener("click", async ()=>{
+  if(busy) return; busy=true; btn.disabled=true; btn.classList.add("spinning");
+  msg.classList.remove("show"); hd.classList.remove("show");
+  slots.forEach(s=>s.el.classList.remove("locked","pop"));
+  burst(...center(btn),60,7,true); beep(330,.15,.06);
+
+  const result = pickLineup();
+  const sparkle = setInterval(()=>sparkleAround(btn),40);
+  measure();
+
+  const jobs = slots.map((s,i)=>{
+    if(s.pos==="SF"){
+      return new Promise(r=>setTimeout(()=>{ lock(s); r(); }, 900+i*500));
+    }
+    const pool = ROSTER[s.pos];
+    const n = 22 + i*8;
+    const names = Array.from({length:n},()=>rand(pool)); names.push(result[s.pos]);
+    s.strip.style.transition="none"; s.strip.style.transform="translateY(0)";
+    s.strip.innerHTML = names.map(itemHTML).join("");
+    void s.strip.offsetHeight;
+    const dur = 2.0 + i*0.7;
+    s.strip.style.transition = `transform ${dur}s cubic-bezier(.12,.62,.08,1)`;
+    s.strip.style.transform = `translateY(${-(names.length-1)*H}px)`;
+    let t=0; const tick=setInterval(()=>{ beep(500+Math.random()*250,.03,.025,"square"); if(++t>dur*9) clearInterval(tick); },110);
+    return new Promise(r=>setTimeout(()=>{ clearInterval(tick); lock(s); r(); }, dur*1000+60));
+  });
+
+  await Promise.all(jobs);
+  clearInterval(sparkle);
+  await new Promise(r=>setTimeout(r,350));
+  chime();
+  const [mx]=center(lineup);
+  [0,200,400].forEach(d=>setTimeout(()=>burst(mx+(Math.random()-.5)*500, innerHeight*.3+Math.random()*120, 90, 9, true),d));
+  $("#cap").textContent = pickCaption(result);
+  msg.classList.add("show"); hd.classList.add("show");
+  btn.classList.remove("spinning"); btn.disabled=false; busy=false;
+});
+
+init();
+</script>
+</body>
+</html>
